@@ -17,9 +17,10 @@
             display: block;
             margin-bottom: 5px;
         }
-        input[type="number"] {
+        input, select {
             padding: 8px;
-            width: 100px;
+            width: 200px;
+            margin-bottom: 10px;
         }
         button {
             padding: 10px 20px;
@@ -32,28 +33,73 @@
 </head>
 <body>
 
-    <h1>Generate OMR Answer Sheet</h1>
+    <h1>Generate Customizable OMR Sheet</h1>
     <form id="omrForm">
+        <!-- Number of Questions -->
         <div class="form-group">
             <label for="numQuestions">Number of Questions:</label>
             <input type="number" id="numQuestions" min="1" required>
         </div>
 
+        <!-- Number of Options per Question -->
         <div class="form-group">
             <label for="numOptions">Number of Options per Question (e.g., A, B, C, D):</label>
             <input type="number" id="numOptions" min="1" max="10" required>
         </div>
 
+        <!-- Mark Type -->
+        <div class="form-group">
+            <label for="markType">Mark Type:</label>
+            <select id="markType">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+            </select>
+        </div>
+
+        <!-- Layout Style -->
+        <div class="form-group">
+            <label for="layoutStyle">Layout Style:</label>
+            <select id="layoutStyle">
+                <option value="single-column">Single Column</option>
+                <option value="double-column">Double Column</option>
+            </select>
+        </div>
+
+        <!-- Add Name and ID -->
+        <div class="form-group">
+            <label for="addDetails">Include Name and ID Fields:</label>
+            <select id="addDetails">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <!-- Generate Answer Key -->
+        <div class="form-group">
+            <label for="generateKey">Generate Answer Key:</label>
+            <select id="generateKey">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
         <button type="submit">Generate OMR Sheet</button>
     </form>
 
     <script>
         document.getElementById('omrForm').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // Get form values
             const numQuestions = document.getElementById('numQuestions').value;
             const numOptions = document.getElementById('numOptions').value;
+            const markType = document.getElementById('markType').value;
+            const layoutStyle = document.getElementById('layoutStyle').value;
+            const addDetails = document.getElementById('addDetails').value;
+            const generateKey = document.getElementById('generateKey').value;
 
-            // Call the back-end API to generate OMR sheet
+            // Call back-end to generate OMR sheet
             fetch('/generate-omr', {
                 method: 'POST',
                 headers: {
@@ -61,7 +107,11 @@
                 },
                 body: JSON.stringify({
                     numQuestions: numQuestions,
-                    numOptions: numOptions
+                    numOptions: numOptions,
+                    markType: markType,
+                    layoutStyle: layoutStyle,
+                    addDetails: addDetails,
+                    generateKey: generateKey
                 })
             })
             .then(response => response.blob())
