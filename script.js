@@ -1,38 +1,3 @@
-const express = require('express');
-const { PDFDocument, rgb } = require('pdf-lib');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-
-// Helper function to draw options
-function drawOptions(page, x, y, numOptions, markType) {
-    const shapeSize = 12;
-    for (let i = 0; i < numOptions; i++) {
-        const optionLetter = String.fromCharCode(65 + i); // 'A', 'B', 'C', etc.
-        page.drawText(optionLetter, { x: x + (i * 50), y: y, size: 12 });
-
-        if (markType === 'circle') {
-            page.drawCircle({
-                x: x + (i * 50) + 15,
-                y: y - 5,
-                size: shapeSize,
-                borderColor: rgb(0, 0, 0),
-                borderWidth: 1,
-            });
-        } else {
-            page.drawRectangle({
-                x: x + (i * 50) + 10,
-                y: y - 12,
-                width: shapeSize,
-                height: shapeSize,
-                borderColor: rgb(0, 0, 0),
-                borderWidth: 1,
-            });
-        }
-    }
-}
-
 // Endpoint to generate OMR Sheet
 app.post('/generate-omr', async (req, res) => {
     try {
@@ -108,16 +73,13 @@ app.post('/generate-omr', async (req, res) => {
 
         // Finalize PDF and send as response
         const pdfBytes = await pdfDoc.save();
+
+        // Correct response headers
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', 'attachment; filename="omr-sheet.pdf"');
-        res.send(Buffer.from(pdfBytes));
+        res.status(200).send(pdfBytes);
     } catch (error) {
         console.error('Error generating OMR sheet:', error);
         res.status(500).json({ error: 'Failed to generate OMR sheet.' });
     }
-});
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
 });
